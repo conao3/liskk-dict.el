@@ -7,6 +7,9 @@
 # Emacs Lisp compiled files
 *.elc
 
+# Emacs bin
+emacs-bin-*
+
 SKK-JISYO.*.gz
 SKK-JISYO.*.md5
 zipcode.*.gz
