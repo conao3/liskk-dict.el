@@ -15,10 +15,14 @@ BATCH        := $(EMACS) -Q --batch -L $(TOP) $(DEPENDS:%=-L ./%/)
 
 .PHONY: all git-hook build check allcheck test clean clean-v
 
-convert: $(utf-8/ALL_SRCS)
+convert: utf-8 $(ALL_SRCS:%=utf-8/%)
 
-utf-8/%:%
-	
+utf-8:
+	mkdir $@
+
+utf-8/%: %
+	docker run --rm -v $$PWD:/work conao3/nkf -b -d /work/$< > $@
+
 ##############################
 
 checkout:
@@ -209,5 +213,8 @@ all: annotated-all unannotated-all taciturn-all
 
 cdb:
 	$(PYTHON) $(TOOLS_DIR)/$(SKK2CDB) $(CDB_TARGET) $(CDB_SOURCE)
+
+# conao3 added
+convert: utf-8 $(ALL_SRCS:%=utf-8/%)
 
 # end of Makefile.
