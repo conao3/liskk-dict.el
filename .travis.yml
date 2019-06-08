@@ -26,6 +26,7 @@ jobs:
       stage: "Create dictionary"
       script:
         - make checkout
+        - make upstream-merge
         - rm -rf utf-8
-        - make convert
+        - make convert -i
         - make commit && make merge && make push

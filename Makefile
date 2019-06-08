@@ -198,6 +198,11 @@ checkout:
 	git checkout -b travis-$$TRAVIS_JOB_NUMBER
 	echo "job $$TRAVIS_JOB_NUMBER at $(DATEDETAIL)" >> commit.log
 
+upstream-merge:
+	git remote add upstream https://github.com/skk-dev/dict.git
+	git fetch --all
+	git merge upstream/master
+
 commit: commit-source commit-convert
 commit-source:
 	git add $(ALL_SRCS)
