@@ -28,5 +28,5 @@ jobs:
         - make checkout
         - make upstream-merge
         - rm -rf utf-8
-        - make convert -i
+        - make convert -i -j8
         - make commit && make merge && make push
