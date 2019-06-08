@@ -13,3 +13,4 @@ env:
 
 script:
   - emacs --version
+  - nkf -v
