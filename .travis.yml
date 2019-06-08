@@ -19,6 +19,7 @@ install:
 
   - git remote -v
   - git remote set-url origin git@github.com:conao3/liskk-dict.el.git
+  - docker pull conao3/nkf
 
 jobs:
   include:
