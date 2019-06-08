@@ -186,7 +186,7 @@ BATCH        := $(EMACS) -Q --batch -L $(TOP) $(DEPENDS:%=-L ./%/)
 convert: utf-8 $(ALL_SRCS:%=utf-8/%)
 
 utf-8:
-	mkdir $@
+	mkdir -p $@
 
 utf-8/%: %
 	docker run --rm -v $$PWD:/work conao3/nkf -b -d /work/$< > $@
