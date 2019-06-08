@@ -1,21 +1,12 @@
-all:
+convert:
 
 include Makefunc.mk
 
 TOP          := $(dir $(lastword $(MAKEFILE_LIST)))
-EMACS_RAW    := $(sort $(shell compgen -c emacs- | xargs))
-EXPECT_EMACS  += 24.4 24.5
-EXPECT_EMACS  += 25.1 25.2 25.3
-EXPECT_EMACS  += 26.1 26.2
+SSHKEY        := ~/.ssh/id_rsa
 
-ALL_EMACS    := $(filter $(EMACS_RAW),$(EXPECT_EMACS:%=emacs-%))
-
-DEPENDS      := leaf
-
-TESTFILE     := leaf-keywords-tests.el
-ELS          := leaf-keywords.el
-
-CORTELS      := $(TESTFILE) cort-test.el
+DATE          := $(shell date '+%Y_%m_%d')
+DATEDETAIL    := $(shell date '+%Y/%m/%d %H:%M:%S')
 
 EMACS        ?= emacs
 BATCH        := $(EMACS) -Q --batch -L $(TOP) $(DEPENDS:%=-L ./%/)
@@ -24,72 +15,36 @@ BATCH        := $(EMACS) -Q --batch -L $(TOP) $(DEPENDS:%=-L ./%/)
 
 .PHONY: all git-hook build check allcheck test clean clean-v
 
-all: git-hook build
+convert: $(utf-8/ALL_SRCS)
 
+utf-8/%:%
+	
 ##############################
 
-git-hook:
-	cp -a git-hooks/* .git/hooks/
+checkout:
+	git checkout master
+	git checkout -b travis-$$TRAVIS_JOB_NUMBER
+	echo "job $$TRAVIS_JOB_NUMBER at $(DATEDETAIL)" >> commit.log
 
-build: $(ELS:%.el=%.elc)
+commit: commit-source commit-convert
+commit-source:
+	git add $(ALL_SRCS)
+	git diff --cached --stat | tail -n1 >> commit.log
+	git commit --allow-empty -m "update source (job $$TRAVIS_JOB_NUMBER) [skip ci]"
 
-%.elc: %.el $(DEPENDS)
-	$(BATCH) $(DEPENDS:%=-L %/) -f batch-byte-compile $<
+commit-convert:
+	git add .
+	git diff --cached --stat | tail -n1 >> commit.log
+	git commit --allow-empty -m "convert dictionaries (job $$TRAVIS_JOB_NUMBER) [skip ci]"
 
-##############################
-#
-#  one-time test (on top level)
-#
+merge:
+	git checkout master
+	git merge --no-ff travis-$$TRAVIS_JOB_NUMBER -m "merge travis-$$TRAVIS_JOB_NUMBER [skip ci]"
 
-check: build
-	$(BATCH) -l $(TESTFILE) -f cort-test-run
-
-##############################
-#
-#  multi Emacs version test (on independent environment)
-#
-
-allcheck: $(ALL_EMACS:%=.make/verbose-%)
-	@echo ""
-	@cat $(^:%=%/.make-test-log) | grep =====
-	@rm -rf $^
-
-.make/verbose-%: $(DEPENDS)
-	mkdir -p $@
-	cp -rf $(ELS) $(CORTELS) $(DEPENDS) $@/
-	cd $@; echo $(ELS) | xargs -n1 -t $* -Q --batch -L ./ $(DEPENDS:%=-L ./%/) -f batch-byte-compile
-	cd $@; $* -Q --batch -L ./ $(DEPENDS:%=-L ./%/) -l $(TESTFILE) -f cort-test-run | tee .make-test-log
+push:
+	git push origin master
 
 ##############################
-#
-#  silent `allcheck' job
-#
-
-test: $(ALL_EMACS:%=.make/silent-%)
-	@echo ""
-	@cat $(^:%=%/.make-test-log) | grep =====
-	@rm -rf $^
-
-.make/silent-%: $(DEPENDS)
-	@mkdir -p $@
-	@cp -rf $(ELS) $(CORTELS) $(DEPENDS) $@/
-	@cd $@; echo $(ELS) | xargs -n1 $* -Q --batch -L ./ $(DEPENDS:%=-L ./%/) -f batch-byte-compile
-	@cd $@; $* -Q --batch -L ./ $(DEPENDS:%=-L ./%/) -l $(TESTFILE) -f cort-test-run > .make-test-log 2>&1
-
-##############################
-
-clean:
-	rm -rf $(ELC) $(DEPENDS) .make
-
-##############################
-#
-#  depend files
-#
-
-leaf:
-	curl -L https://github.com/conao3/leaf.el/archive/master.tar.gz > $@.tar.gz
-	mkdir $@ && tar xf $@.tar.gz -C $@ --strip-components 1
-	rm -rf $@.tar.gz
 
 # Makefile: makefile for SKK Dictionaries.
 #
