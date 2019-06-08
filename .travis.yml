@@ -18,7 +18,7 @@ install:
   - git config --global user.email conao3@gmail.com
 
   - git remote -v
-  - git remote set-url origin git@github.com:conao3/feather-recipes.git
+  - git remote set-url origin git@github.com:conao3/liskk-dict.git
 
 jobs:
   include:
