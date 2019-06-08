@@ -202,11 +202,13 @@ commit: commit-source commit-convert
 commit-source:
 	git add $(ALL_SRCS)
 	git diff --cached --stat | tail -n1 >> commit.log
+	git add commit.log
 	git commit --allow-empty -m "update source (job $$TRAVIS_JOB_NUMBER) [skip ci]"
 
 commit-convert:
 	git add .
 	git diff --cached --stat | tail -n1 >> commit.log
+	git add commit.log
 	git commit --allow-empty -m "convert dictionaries (job $$TRAVIS_JOB_NUMBER) [skip ci]"
 
 merge:
