@@ -1,53 +1,5 @@
 convert:
 
-include Makefunc.mk
-
-TOP          := $(dir $(lastword $(MAKEFILE_LIST)))
-SSHKEY        := ~/.ssh/id_rsa
-
-DATE          := $(shell date '+%Y_%m_%d')
-DATEDETAIL    := $(shell date '+%Y/%m/%d %H:%M:%S')
-
-EMACS        ?= emacs
-BATCH        := $(EMACS) -Q --batch -L $(TOP) $(DEPENDS:%=-L ./%/)
-
-##################################################
-
-.PHONY: all git-hook build check allcheck test clean clean-v
-
-convert: utf-8 $(ALL_SRCS:%=utf-8/%)
-
-utf-8:
-	mkdir $@
-
-utf-8/%: %
-	docker run --rm -v $$PWD:/work conao3/nkf -b -d /work/$< > $@
-
-##############################
-
-checkout:
-	git checkout master
-	git checkout -b travis-$$TRAVIS_JOB_NUMBER
-	echo "job $$TRAVIS_JOB_NUMBER at $(DATEDETAIL)" >> commit.log
-
-commit: commit-source commit-convert
-commit-source:
-	git add $(ALL_SRCS)
-	git diff --cached --stat | tail -n1 >> commit.log
-	git commit --allow-empty -m "update source (job $$TRAVIS_JOB_NUMBER) [skip ci]"
-
-commit-convert:
-	git add .
-	git diff --cached --stat | tail -n1 >> commit.log
-	git commit --allow-empty -m "convert dictionaries (job $$TRAVIS_JOB_NUMBER) [skip ci]"
-
-merge:
-	git checkout master
-	git merge --no-ff travis-$$TRAVIS_JOB_NUMBER -m "merge travis-$$TRAVIS_JOB_NUMBER [skip ci]"
-
-push:
-	git push origin master
-
 ##############################
 
 # Makefile: makefile for SKK Dictionaries.
@@ -214,7 +166,52 @@ all: annotated-all unannotated-all taciturn-all
 cdb:
 	$(PYTHON) $(TOOLS_DIR)/$(SKK2CDB) $(CDB_TARGET) $(CDB_SOURCE)
 
-# conao3 added
+# end of Makefile.
+
+include Makefunc.mk
+
+TOP          := $(dir $(lastword $(MAKEFILE_LIST)))
+SSHKEY        := ~/.ssh/id_rsa
+
+DATE          := $(shell date '+%Y_%m_%d')
+DATEDETAIL    := $(shell date '+%Y/%m/%d %H:%M:%S')
+
+EMACS        ?= emacs
+BATCH        := $(EMACS) -Q --batch -L $(TOP) $(DEPENDS:%=-L ./%/)
+
+##################################################
+
+.PHONY: all convert utf-8 checkout commit commit-source commit-convert merge push
+
 convert: utf-8 $(ALL_SRCS:%=utf-8/%)
 
-# end of Makefile.
+utf-8:
+	mkdir $@
+
+utf-8/%: %
+	docker run --rm -v $$PWD:/work conao3/nkf -b -d /work/$< > $@
+
+##############################
+
+checkout:
+	git checkout master
+	git checkout -b travis-$$TRAVIS_JOB_NUMBER
+	echo "job $$TRAVIS_JOB_NUMBER at $(DATEDETAIL)" >> commit.log
+
+commit: commit-source commit-convert
+commit-source:
+	git add $(ALL_SRCS)
+	git diff --cached --stat | tail -n1 >> commit.log
+	git commit --allow-empty -m "update source (job $$TRAVIS_JOB_NUMBER) [skip ci]"
+
+commit-convert:
+	git add .
+	git diff --cached --stat | tail -n1 >> commit.log
+	git commit --allow-empty -m "convert dictionaries (job $$TRAVIS_JOB_NUMBER) [skip ci]"
+
+merge:
+	git checkout master
+	git merge --no-ff travis-$$TRAVIS_JOB_NUMBER -m "merge travis-$$TRAVIS_JOB_NUMBER [skip ci]"
+
+push:
+	git push origin master
