@@ -189,7 +189,7 @@ utf-8:
 	mkdir -p $@
 
 utf-8/%: %
-	docker run --rm -v $$PWD:/work conao3/nkf -b -d /work/$< > $@
+	docker run --rm -v $$PWD:/work conao3/nkf -Lu -d -w /work/$< > $@
 
 ##############################
 
