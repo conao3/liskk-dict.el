@@ -1,4 +1,4 @@
-;; -*- mode: fundamental; coding: euc-jp -*-
+;; -*- mode: fundamental; coding: utf-8 -*-
 ;; Small size dictionary for SKK system
 ;; Copyright (C) 1988-1995, 1997, 1999-2003
 ;;
