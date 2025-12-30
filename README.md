@@ -1,69 +1,66 @@
-# SKK dictionary files
+# liskk-dict.el
 
-Refer to the following URL for the distribution files.
+Dictionary files for [liskk.el](https://github.com/conao3/liskk.el), providing SKK-based Japanese input support in Emacs.
 
-https://skk-dev.github.io/dict/
+## Overview
 
+This package provides pre-packaged SKK dictionary files for use with liskk.el. It includes various dictionary sets covering general vocabulary, proper nouns, geographic names, and specialized terminology.
 
-# 辞書ファイルの編集
+## Requirements
 
-ChangeLog の記述には 「真鵺道」(まぬえど) を使います。
+- Emacs 24.4 or later
 
-  - https://sundayresearch.eu/hitoshi/otherprojects/manued/index-j.html
-  - https://github.com/yamauchih/manued
+## Installation
 
+### Using package.el
 
-# 辞書ファイルの公開
+Add this repository to your package archives and install:
 
-## 配布用の gzip アーカイブを作る
-
-`make archive` を実行すると、配布用の gzip ファイルを作ることができます。
-この過程では `skktools` を用いて `csv/china_taiwan.csv` から `SKK-JISYO.china_taiwan` を
-生成しているため、あらかじめ Ruby 処理系と `skktools` をインストールしておいてく
-ださい。
-
-具体的には、次のようにコマンドを実行すると、
-
-```
-$ make archive TOOLS_DIR=../github.skktools
+```elisp
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+(package-install 'liskk-dict)
 ```
 
-カレントディレクトリに `SKK-JISYO.*.gz`, `SKK-JISYO.*.md5`, `zipdoce.*.gz`,
-`zipdoce.*.md5` が生成されます。
+### Manual Installation
 
-これらのファイルは、いったん退避しておきましょう。
+Clone this repository and add it to your load-path:
 
-```
-$ mv SKK-JISYO.*.gz ../
-$ mv SKK-JISYO.*.md5 ../
-$ mv zipdoce.*.gz ../
-$ mv zipdoce.*.md5 ../
+```elisp
+(add-to-list 'load-path "/path/to/liskk-dict.el")
+(require 'liskk-dict)
 ```
 
-## make の副作用
+## Included Dictionaries
 
-`make archive` の実行過程で、いくつかのファイルが更新される場合があります。
+This package bundles the following SKK dictionaries:
 
-```
-$ git status
+| Dictionary | Description |
+|------------|-------------|
+| SKK-JISYO.L | Large dictionary with comprehensive vocabulary |
+| SKK-JISYO.M | Medium-sized dictionary |
+| SKK-JISYO.S | Small dictionary for basic usage |
+| SKK-JISYO.geo | Geographic names |
+| SKK-JISYO.jinmei | Personal names |
+| SKK-JISYO.station | Train station names |
+| SKK-JISYO.propernoun | Proper nouns |
+| SKK-JISYO.law | Legal terminology |
+| SKK-JISYO.lisp | Lisp-related terms |
 
-On branch master
-Your branch is up to date with 'origin/master'.
+For additional dictionaries and details, see the [SKK Dictionary Project](https://skk-dev.github.io/dict/).
 
-Changes not staged for commit:
-        modified:   SKK-JISYO.L.unannotated
-        modified:   SKK-JISYO.wrong
-```
+## Dictionary Sources
 
-更新内容に問題がなければ、そのまま commit してください。
+The dictionaries included in this package are converted from the official SKK dictionary project. For information about editing dictionaries or contributing upstream, refer to:
 
-```
-$ git add -u && git commit
-```
+- [Manued documentation tool](https://sundayresearch.eu/hitoshi/otherprojects/manued/index-j.html)
+- [Manued on GitHub](https://github.com/yamauchih/manued)
 
+## License
 
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-## 配布用の gzip アーカイブをブランチ gh-pages に配置
+## Author
 
-さきほど退避しておいた `SKK-JISYO.*.gz`, `SKK-JISYO.*.md5`, `zipdoce.*.gz`, `zipdoce.*.md5` を
-ブランチ gh-pages に mv して add && push します。
+Naoya Yamashita (conao3@gmail.com)
